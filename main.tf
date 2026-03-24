@@ -1,32 +1,44 @@
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
 }
 
 resource "aws_instance" "firstec2" {
-  ami = "ami-053b0d53c279acc90"
-  instance_type = "t3.micro"
+  ami = var.ami_id
+  instance_type = var.instance_type
   vpc_security_group_ids = [ aws_security_group.secgroup.id ]
 
   user_data = <<-EOF
               #!/bin/bash
-              echo "Hello, World" > index.html
-              nohup busybox httpd -f -p 8080 &
+              echo "${var.web_message}" > index.html
+              nohup busybox httpd -f -p ${var.port_number} &
               EOF
 
   user_data_replace_on_change = true
 
   tags = {
-    Name = "my-first-ec2"
+    Name = var.instance_name
   }
 }
 
 resource "aws_security_group" "secgroup" {
-  name = "my-instance-sg-east1"
+  name = var.security_group_name
 
   ingress {
-    from_port = 8080
-    to_port = 8080
+    from_port = var.port_number
+    to_port = var.port_number
     protocol = "tcp"
-    cidr_blocks = [ "0.0.0.0/0" ]
+    cidr_blocks = var.allowed_cidr_blocks
   }
+}
+
+data "aws_instance" "fetchtest" {
+
+  filter {
+    name   = "tag:Name"
+    values = ["${var.instance_name}"]
+  }
+}
+
+output "show_fetched" {
+  value = data.aws_instance.fetchtest.public_ip
 }

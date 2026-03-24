@@ -9,7 +9,7 @@ graph TB
         C
     end
 
-    style A fill:#e1f5fe,color:black
+    style A fill:#e1f5fe,color:blacks
     style B fill:#fff3e0,color:black
     style C fill:#e8f5e8,color:black
     style D fill:#fce4ec,color:black
