@@ -13,7 +13,7 @@ variable "instance_type" {
 variable "port_number" {
  description = "The http port number"
  type = number
- default = 8080
+ default = 80
 }
 
 variable "ami_id" {
@@ -43,7 +43,7 @@ variable "allowed_cidr_blocks" {
 variable "web_message" {
   description = "Message to display on the web server"
   type        = string
-  default     = "Hello, World"
+  default     = "Hello, World. I have used variables in Terraform."
 }
 
 

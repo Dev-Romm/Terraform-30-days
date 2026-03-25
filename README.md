@@ -1,21 +1,66 @@
-# Terraform 30 Days Challenge - Day 3: Deploying Your First Server
+# Terraform 30 Days Challenge - Day 4: Auto Scaling and Load Balancing
 
 ## Overview
 
-This project is part of the **30-Day Terraform Challenge** organized by **HashiCorp User Group Meru** and **AWS AI/ML User Group Kenya**. Day 3 focuses on deploying your first EC2 server on AWS using Terraform.
+This project is part of the **30-Day Terraform Challenge** organized by **HashiCorp User Group Meru** and **AWS AI/ML User Group Kenya**. Day 4 focuses on implementing **Auto Scaling Groups (ASG)** and **Application Load Balancers (ALB)** for scalable web applications.
 
 ## What This Project Does
 
-This Terraform configuration creates:
-- **EC2 Instance**: A t3.micro instance (Free Tier eligible) running Amazon Linux 2
-- **Security Group**: Allows inbound HTTP traffic on port 8080 from anywhere
-- **Web Server**: Simple web server serving "Hello, World" on port 8080
+This Terraform configuration creates a **highly available and scalable web infrastructure**:
+- **Launch Configuration**: Template for EC2 instances in the ASG
+- **Auto Scaling Group**: Automatically scales EC2 instances (2-10 instances)
+- **Application Load Balancer**: Distributes traffic across instances
+- **Target Group**: Health checks and routing for the ASG
+- **Security Groups**: Network security for ALB and instances
+- **Data Sources**: Dynamically discovers default VPC and subnets
 
 ## Architecture
 
 ```
-Internet → Security Group (Port 8080) → EC2 Instance → Web Server
+Internet → ALB (Port 80) → Target Group → Auto Scaling Group (2-10 EC2 instances)
+                                    ↓
+                            Health Checks & Routing
 ```
+
+### Visual Architecture Diagram
+
+For detailed visual representations, see [`architecture.md`](architecture.md) which contains:
+- **Mermaid diagram** (renders on GitHub, VS Code, and online editors)
+- **ASCII art diagram** for terminal/text viewing
+- **Terraform graph output** showing resource dependencies
+
+**Quick Architecture Overview:**
+- 🌐 **Internet** → ⚖️ **ALB** (Port 80) → 🎯 **Target Group** → 📈 **Auto Scaling Group** (2-10 EC2 instances)
+
+### Architecture Diagram Tools
+
+1. **Mermaid** (Recommended - Text-based, version controlled)
+   - Renders automatically on GitHub
+   - VS Code extension available
+   - Online editor: https://mermaid.live/
+
+2. **Draw.io/diagrams.net** (Free online tool)
+   - Drag-and-drop interface
+   - AWS architecture icons available
+   - Export to PNG/SVG
+
+3. **Terraform Graph** (Command-line)
+   ```bash
+   terraform graph | dot -Tpng > architecture.png
+   ```
+   *Requires GraphViz installation*
+
+   **Quick PNG Generation:**
+   - Run `generate-png.bat` (Windows batch file)
+   - Run `generate-png.ps1` (PowerShell script)
+   - Then use online GraphViz tools to convert `graph.dot` to PNG
+
+4. **AWS Architecture Icons** (Professional)
+   - Official AWS icon library
+   - Use in PowerPoint, Lucidchart, etc.
+
+5. **CloudCraft or CloudMapper** (AWS-specific tools)
+   - Generate diagrams from actual AWS resources
 
 ## Prerequisites
 
@@ -77,33 +122,53 @@ aws configure
 
 | Resource | Type | Description |
 |----------|------|-------------|
-| `aws_instance.firstec2` | EC2 Instance | t3.micro instance with web server |
-| `aws_security_group.secgroup` | Security Group | Allows port 8080 inbound traffic |
+| `aws_launch_configuration.myLG` | Launch Configuration | Template for EC2 instances in ASG |
+| `aws_autoscaling_group.myASG` | Auto Scaling Group | Scales between 2-10 EC2 instances |
+| `aws_lb.myALB` | Application Load Balancer | Distributes traffic across instances |
+| `aws_lb_target_group.asg` | Target Group | Health checks and routing for ASG |
+| `aws_lb_listener.http` | Load Balancer Listener | Listens on port 80, returns 404 |
+| `aws_security_group.alb` | Security Group | Network security for ALB and instances |
+| `data.aws_vpc.default` | Data Source | Default VPC information |
+| `data.aws_subnets.default` | Data Source | Default subnet information |
 
 ### Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `aws_region` | us-east-1 | AWS region for deployment |
-| `vpc_name` | demo_vpc | Name of the VPC (not used yet) |
-| `vpc_cidr` | 10.0.0.0/16 | VPC CIDR block (not used yet) |
+| `instance_type` | t3.micro | EC2 instance type for ASG |
+| `ami_id` | ami-053b0d53c279acc90 | AMI ID for EC2 instances |
+| `port_number` | 8080 | HTTP port for web server |
+| `web_message` | "Hello, World. I have used variables in Terraform." | Message displayed on web server |
+| `allowed_cidr_blocks` | ["0.0.0.0/0"] | CIDR blocks allowed access |
+| `security_group_name` | my-instance-sg-east1 | Name of security group |
+| `instance_name` | my-first-ec2 | Name tag for instances |
 
 ## Usage Examples
 
-### Access Your Web Server
+### Access Your Load Balanced Application
 
-After deployment, your EC2 instance will be running a simple web server. You can access it at:
+After deployment, your ALB will distribute traffic across multiple EC2 instances. You can access it at:
 ```
-http://<public-ip>:8080
+http://<alb-dns-name>
 ```
 
-This will display: **"Hello, World"**
+This will display: **"Hello, World. I have used variables in Terraform."**
 
-### Clean Up
+### Check Auto Scaling
 
-To destroy the infrastructure:
+- **View instances**: The ASG will create 2 instances initially
+- **Test scaling**: The ASG can scale up to 10 instances based on load
+- **Health checks**: ALB performs health checks on / path every 15 seconds
+
+### Get Load Balancer DNS
+
 ```bash
-terraform destroy
+# Get the ALB DNS name
+terraform output alb_dns_name
+
+# Or check AWS console
+aws elbv2 describe-load-balancers --names terraform-asg-example --query 'LoadBalancers[0].DNSName' --output text
 ```
 
 ## Troubleshooting
@@ -131,7 +196,7 @@ terraform destroy
 ## Challenge Information
 
 - **Challenge**: 30-Day Terraform Challenge
-- **Day**: 3 - Deploying Your First Server
+- **Day**: 4 - Auto Scaling and Load Balancing
 - **Organizers**:
   - HashiCorp User Group Meru
   - AWS AI/ML User Group Kenya
@@ -143,10 +208,6 @@ terraform destroy
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
