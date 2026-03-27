@@ -46,5 +46,17 @@ variable "web_message" {
   default     = "Hello, World. I have used variables in Terraform."
 }
 
+variable "enable_alb" {
+  description = "Whether to enable the Application Load Balancer"
+  type        = bool
+  default     = true
+}
+
+variable "enable_detailed_monitoring" {
+  description = "Whether to enable detailed monitoring for EC2 instances"
+  type        = bool
+  default     = false
+}
+
 
 

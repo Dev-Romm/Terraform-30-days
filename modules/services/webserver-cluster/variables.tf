@@ -47,3 +47,17 @@ variable "availability_zones" {
   type        = list(string)
   default     = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1f"]
 }
+
+variable "enable_alb" {
+  description = "Whether to enable the Application Load Balancer"
+  type        = bool
+  default     = true
+}
+
+variable "enable_detailed_monitoring" {
+  description = "Whether to enable detailed monitoring for EC2 instances"
+  type        = bool
+  default     = false
+}
+
+

@@ -14,6 +14,8 @@ module "webserver_cluster" {
   web_message   = var.web_message
   allowed_cidr_blocks = var.allowed_cidr_blocks
   availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1f"]
+  enable_alb = var.enable_alb
+  enable_detailed_monitoring = var.enable_detailed_monitoring
 }
 
 output "alb_dns_name" {

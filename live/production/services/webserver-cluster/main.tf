@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 module "webserver_cluster" {
-  source = "../../../../modules/services/webserver-cluster"
+  source = "github.com/Dev-Romm/Terraform-30-days-module-versioning.git?ref=v0.0.2"
 
   cluster_name  = "webservers-production"
   instance_type = "t2.micro"
