@@ -3,17 +3,19 @@ provider "aws" {
 }
 
 module "webserver_cluster" {
-  source = "github.com/Dev-Romm/Terraform-30-days-module-versioning.git?ref=v0.0.6"
+  source = "file:///D:/Projects/Terraform%2030%20Days/Day%203%20Deploying%20Your%20First%20Server%20with%20Terraform/terraform/modules/services/webserver-cluster"
 
-  cluster_name  = "webservers-dev"
-  instance_type = "t3.micro"
-  min_size      = 2
-  max_size      = 4
+  cluster_name  = "web-dev"
   server_port   = 80
   ami_id        = "ami-053b0d53c279acc90"
-  web_message   = "Hello from dev environment"
+  web_message   = "Hello again, from dev environment. This is v2."
   enable_alb    = true
   enable_detailed_monitoring = false
+  environment = "dev"
+  create_dns_record = false
+  use_existing_vpc = false
+  domain_name = ""
+  active_environment = "blue"
 }
 
 output "alb_dns_name" {
@@ -22,4 +24,8 @@ output "alb_dns_name" {
 
 output "availability_zones_map" {
   value = module.webserver_cluster.availability_zones_map
+}
+
+output "vpc_id" {
+  value = module.webserver_cluster.vpc_id
 }

@@ -3,22 +3,6 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "instance_type" {
-  description = "EC2 instance type for the cluster"
-  type        = string
-  default     = "t3.micro"
-}
-
-variable "min_size" {
-  description = "Minimum number of EC2 instances in the ASG"
-  type        = number
-}
-
-variable "max_size" {
-  description = "Maximum number of EC2 instances in the ASG"
-  type        = number
-}
-
 variable "server_port" {
   description = "Port the server uses for HTTP"
   type        = number
@@ -48,16 +32,54 @@ variable "availability_zones" {
   default     = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1f"]
 }
 
+variable "environment" {
+  description = "Deployment environment: dev, staging, or production"
+  type        = string
+
+  validation {
+    condition     = contains(["dev", "staging", "production"], var.environment)
+    error_message = "Environment must be dev, staging, or production."
+  }
+}
+
 variable "enable_alb" {
   description = "Whether to enable the Application Load Balancer"
   type        = bool
   default     = true
 }
 
+variable "active_environment" {
+  description = "Which environment is currently active: blue or green"
+  type        = string
+  default     = "blue"
+
+  validation {
+    condition     = contains(["blue", "green"], var.active_environment)
+    error_message = "Active environment must be blue or green."
+  }
+}
+
 variable "enable_detailed_monitoring" {
   description = "Whether to enable detailed monitoring for EC2 instances"
   type        = bool
   default     = false
+}
+
+variable "create_dns_record" {
+  description = "Whether to create a Route53 DNS record for the ALB"
+  type        = bool
+  default     = false
+}
+
+variable "use_existing_vpc" {
+  type    = bool
+  default = false
+}
+
+variable "domain_name" {
+  description = "Domain name for Route53 record"
+  type        = string
+  default     = ""
 }
 
 

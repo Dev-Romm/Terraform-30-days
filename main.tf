@@ -6,16 +6,17 @@ module "webserver_cluster" {
   source = "./modules/services/webserver-cluster"
 
   cluster_name  = "terraform-asg-example"
-  instance_type = var.instance_type
-  min_size      = 2
-  max_size      = 10
   server_port   = var.port_number
   ami_id        = var.ami_id
   web_message   = var.web_message
   allowed_cidr_blocks = var.allowed_cidr_blocks
   availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1f"]
-  enable_alb = var.enable_alb
-  enable_detailed_monitoring = var.enable_detailed_monitoring
+  enable_alb = true
+  enable_detailed_monitoring = false
+  environment = "dev"
+  create_dns_record = false
+  use_existing_vpc = false
+  domain_name = ""
 }
 
 output "alb_dns_name" {

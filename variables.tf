@@ -43,7 +43,7 @@ variable "allowed_cidr_blocks" {
 variable "web_message" {
   description = "Message to display on the web server"
   type        = string
-  default     = "Hello, World. I have used variables in Terraform."
+  default     = "Hello, People. This is v1."
 }
 
 variable "enable_alb" {
